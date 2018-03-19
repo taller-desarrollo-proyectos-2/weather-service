@@ -58,10 +58,16 @@ public class OpenWeatherMap implements WeatherProvider {
                         if(sDay > 0) {
                             dayNode.put("day_temperature", tempDay/sDay);
                             dayNode.put("day_weather", weatherDay);
+                        } else {
+                            dayNode.put("day_temperature", "");
+                            dayNode.put("day_weather", "");
                         }
                         if(sNight > 0) {
                             dayNode.put("night_temperature", tempNight/sNight);
                             dayNode.put("night_weather", weatherNight);
+                        } else {
+                            dayNode.put("night_temperature", "");
+                            dayNode.put("night_weather", "");
                         }
                         forecast.add(dayNode);
                         date = nodeDate;
