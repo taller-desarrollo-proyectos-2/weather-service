@@ -52,8 +52,8 @@ public class OpenWeatherMap implements WeatherProvider {
                         ObjectNode dayNode = JsonNodeFactory.instance.objectNode();
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         dayNode.put("date", sdf.format(date));
-                        if(sDay >0) dayNode.put("temp_day", tempDay/sDay);
-                        if(sNight >0) dayNode.put("temp_night", tempNight/sNight);
+                        if(sDay >0) dayNode.put("day_temperature", tempDay/sDay);
+                        if(sNight >0) dayNode.put("night_temperature", tempNight/sNight);
                         forecast.add(dayNode);
                         date = nodeDate;
                         tempDay = 0;
