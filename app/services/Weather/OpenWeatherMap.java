@@ -22,7 +22,7 @@ public class OpenWeatherMap implements WeatherProvider {
     @Override
     public F.Promise<String> getWeather(String city, int days) {
 
-        return WS.url(url).setQueryParameter("id", city).setHeader("x-api-key", apiKey).get().map(
+        return WS.url(url).setQueryParameter("id", city).setQueryParameter("units", "metric").setHeader("x-api-key", apiKey).get().map(
                 response -> response.asJson().toString()
         );
 
