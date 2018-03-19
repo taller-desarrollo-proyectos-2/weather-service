@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.typesafe.config.ConfigFactory;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import play.Logger;
 import play.libs.F;
 import play.libs.Json;
@@ -38,10 +40,42 @@ public class OpenWeatherMap implements WeatherProvider {
                 ArrayNode forecast = JsonNodeFactory.instance.arrayNode();
                 ObjectNode bodyResponse = JsonNodeFactory.instance.objectNode();
                 bodyResponse.put("cityCode", openWeatherResponse.get("city").get("id"));
+                Date date = null;
+                float tempDay = 0;
+                float tempNight = 0;
+                int sDay = 0;
+                int sNight = 0;
                 for (JsonNode node : openWeatherResponse.get("list")) {
-                    ObjectNode dayNode = JsonNodeFactory.instance.objectNode();
-                    dayNode.put("data", node.get("main"));
-                    forecast.add(dayNode);
+                    if(date == null) date = new Date(node.get("dt").asLong()*1000);
+                    Date nodeDate = new Date(node.get("dt").asLong()*1000);
+                    if (date.getDate()< nodeDate.getDate()){
+                        ObjectNode dayNode = JsonNodeFactory.instance.objectNode();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        dayNode.put("date", sdf.format(date));
+                        if(sDay >0) dayNode.put("temp_day", tempDay/sDay);
+                        if(sNight >0) dayNode.put("temp_night", tempNight/sNight);
+                        forecast.add(dayNode);
+                        date = nodeDate;
+                        tempDay = 0;
+                        tempNight = 0;
+                        sDay = 0;
+                        sNight = 0;
+                        if(nodeDate.getHours() < 12){
+                            tempDay += Float.parseFloat(node.get("main").get("temp").asText());
+                            sDay ++;
+                        } else {
+                            tempNight += Float.parseFloat(node.get("main").get("temp").asText());
+                            sNight ++;
+                        }
+                    } else {
+                        if(nodeDate.getHours() < 12){
+                            tempDay += Float.parseFloat(node.get("main").get("temp").asText());
+                            sDay ++;
+                        } else {
+                            tempNight += Float.parseFloat(node.get("main").get("temp").asText());
+                            sNight ++;
+                        }
+                    }
                 }
                 bodyResponse.put("forecast", forecast);
                 apiResponse.put("body", bodyResponse);
