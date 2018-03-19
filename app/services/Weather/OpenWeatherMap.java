@@ -45,6 +45,9 @@ public class OpenWeatherMap implements WeatherProvider {
                 float tempNight = 0;
                 int sDay = 0;
                 int sNight = 0;
+                String weatherDay = "";
+                String weatherNight = "";
+                
                 for (JsonNode node : openWeatherResponse.get("list")) {
                     if(date == null) date = new Date(node.get("dt").asLong()*1000);
                     Date nodeDate = new Date(node.get("dt").asLong()*1000);
@@ -52,26 +55,38 @@ public class OpenWeatherMap implements WeatherProvider {
                         ObjectNode dayNode = JsonNodeFactory.instance.objectNode();
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         dayNode.put("date", sdf.format(date));
-                        if(sDay >0) dayNode.put("day_temperature", tempDay/sDay);
-                        if(sNight >0) dayNode.put("night_temperature", tempNight/sNight);
+                        if(sDay > 0) {
+                            dayNode.put("day_temperature", tempDay/sDay);
+                            dayNode.put("day_weather", weatherDay);
+                        }
+                        if(sNight > 0) {
+                            dayNode.put("night_temperature", tempNight/sNight);
+                            dayNode.put("night_weather", weatherNight);
+                        }
                         forecast.add(dayNode);
                         date = nodeDate;
                         tempDay = 0;
                         tempNight = 0;
                         sDay = 0;
                         sNight = 0;
+                        weatherDay = "";
+                        weatherNight = "";
                         if(nodeDate.getHours() < 12){
+                            weatherDay = node.get("weather").get(0).get("main").asText();
                             tempDay += Float.parseFloat(node.get("main").get("temp").asText());
                             sDay ++;
                         } else {
+                            weatherNight = node.get("weather").get(0).get("main").asText();
                             tempNight += Float.parseFloat(node.get("main").get("temp").asText());
                             sNight ++;
                         }
                     } else {
                         if(nodeDate.getHours() < 12){
+                            weatherDay = node.get("weather").get(0).get("main").asText();
                             tempDay += Float.parseFloat(node.get("main").get("temp").asText());
                             sDay ++;
                         } else {
+                            weatherNight = node.get("weather").get(0).get("main").asText();
                             tempNight += Float.parseFloat(node.get("main").get("temp").asText());
                             sNight ++;
                         }
